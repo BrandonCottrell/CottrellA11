@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using MovieLibraryEntities.Context;
 using MovieLibraryEntities.Models;
 using Newtonsoft.Json;
@@ -16,6 +17,7 @@ namespace CottrellA4
                 Console.WriteLine("***** Movie Database *****");
                 Console.WriteLine("1) View Movies");
                 Console.WriteLine("2) Edit Movies");
+                Console.WriteLine("3) Edit Users");
                 Console.WriteLine("Enter to quit");
                 choice = Console.ReadLine();
                 Console.WriteLine($"User Choice: {choice}");
@@ -142,10 +144,71 @@ namespace CottrellA4
                         Console.WriteLine("Not a valid response.");
                     }
 
+                } else if (choice == "3")
+                {
+                    Console.WriteLine("*****Edit User*****");
+                    Console.WriteLine("1) View all Users");
+                    Console.WriteLine("2) Add User");
+
+                    var userResponse = Console.ReadLine();
+
+                    if (userResponse == "1")
+                    {
+                        using (var db = new MovieContext())
+                        {
+                            var allUsers = db.Users;
+                            Console.WriteLine("*****All Users*****");
+                            foreach (var user in allUsers)
+                            {
+                                user.Name = $"{Faker.Name.First()} {Faker.Name.Last()}";
+                                Console.WriteLine($"ID: {user.Id}. {user.Name}");
+                            }
+                            db.SaveChanges();
+                        }
+                    } else if (userResponse == "2")
+                    {
+                        Console.WriteLine("*****Add User*****");
+                        Console.WriteLine("Enter User Name (First and last)");
+                        var newUserName = Console.ReadLine();
+                        Console.WriteLine("Enter User Age");
+                        var newUserAge = (long)Convert.ToDouble(Console.ReadLine()) ;
+                        Console.WriteLine("Enter User Gender");
+                        var newUserGender = Console.ReadLine();
+                        Console.WriteLine("Enter User Zip Code");
+                        var newUserZip = Console.ReadLine();
+                        Console.WriteLine("Enter User Occupation");
+                        var newUserOccupation = Console.ReadLine();
+
+                        Console.WriteLine($"New Occupation: {newUserOccupation} Added.");
+                        Console.WriteLine($"New User: {newUserName} Added.");
+
+                        
+                        using (var dbUser = new MovieContext())
+                        {
+                           
+                            var newUser = new User();
+                            var newOccupation = new Occupation();
+
+                            newOccupation.Name = newUserOccupation;
+
+                            newUser.Name = newUserName;
+                            newUser.Age = newUserAge;
+                            newUser.Gender = newUserGender;
+                            newUser.ZipCode = newUserZip;
+                            
+
+                            dbUser.Occupations.Add(newOccupation);
+                            dbUser.Users.Add(newUser);
+                            // Was having issues adding the users with the Occupation ID.
+                            //dbUser.SaveChanges();
+
+
+                        }  
+                    }
                 }
 
 
-            } while (choice == "1" || choice == "2");
+            } while (choice == "1" || choice == "2" || choice == "3");
         }
     }
 }
